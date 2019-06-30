@@ -1,0 +1,184 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using AuthDatabase.Entities;
+@model LibraryViewModel
+
+@inject SignInManager<AppUser> SignInManager
+@inject UserManager<AppUser> UserManager
+
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+
+    <meta charset="utf-8">
+
+
+    
+
+    <meta http-equiv="X-Ua-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>ShallowLib</title>
+
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/main.css" />
+
+
+
+</head>
+
+<body>
+
+    <header>
+
+        <nav class="navbar navbar-dark bg-jumpers navbar-expand-lg">
+
+            @* <a class="navbar-brand" href="#"><img src="img/logo.png" width="30" height="30" class="d-inline-block mr-1 align-bottom" alt=""> Skoki.pl</a>*@
+
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+
+            <div class="collapse navbar-collapse" id="mainmenu">
+
+                <ul class="navbar-nav mr-1 multi-level mr-auto ">
+
+                    <li class="nav-item active">
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index"> Home </a>
+                        @*<a asp-controller="Home" asp-action="ItemByMediaType" asp-route-id="@Model.Items.Where(w=>w.TypeofMedia=="DVD").Select(s=>s).FirstOrDefault().TypeofMedia"> TEst </a>*@
+                    </li>
+
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        @*<a class="nav-link " href="#" data-toggle="dropdown" role="button" aria-expanded="false" id="submenu" aria-haspopup="true"> Chose Type : </a>*@
+                        <li class="nav-item dropdown ">
+                            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" role="button" aria-expanded="false" id="submenu" aria-haspopup="true"> Type of media </a>
+                            <div class="dropdown-menu " aria-labelledby="dropdownMenu">
+                                <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="Index" asp-route-id="">All</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="Index" asp-route-id="DVD">DVD</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="Index" asp-route-id="CD">CD</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="Index" asp-route-id="Book">Book</a>
+                                <div class="dropdown-divider"></div>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="CreateMedia"> Dodaj </a>
+                        </li>
+                        <form class="form-inline">
+                            <input class="form-control mr-1" name="searchString" type="search" placeholder="Wyszukaj" aria-label="Wyszukaj ">
+                        </form>
+                    }
+                </ul>
+                <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="navbar-right">
+
+                    <button class="btn btn-light" type="submit">Sign out</button>
+
+                </form>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <section class="jumpers">
+
+            <div class="container">
+
+                <header>
+
+                    <h1>Welcome into ShallowLIB</h1>
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <p><strong> @UserManager.GetUserName(User) </strong></p>
+                        <p> The best library of the World!.</p>
+
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Register" asp-route-returnurl="@ViewData["ReturnUrl"]">Register as a new user?</a>
+                    }
+                </header>
+                <div class="row">
+
+                    @RenderBody()
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2019 - ShallowLib by Janusze GbmH - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+
+    <script>
+
+        $(document).ready(function () {
+            $('.dropdown').on('click', function (e) {
+                var $el = $(this);
+                var $parent = $(this).offsetParent(".dropdown-menu");
+                if (!$(this).next().hasClass('show')) {
+                    $(this).parents('.dropdown-menu').first().find('.show').removeClass("show");
+                }
+                var $subMenu = $(this).next(".dropdown-menu");
+                $subMenu.toggleClass('show');
+
+                $(this).parent("li").toggleClass('show');
+
+                $(this).parents('li.nav-item.dropdown.show').on('hidden.bs.dropdown', function (e) {
+                    $('.dropdown-menu .show').removeClass("show");
+                });
+
+
+                if (!$parent.parent().hasClass('navbar-nav')) {
+                    $el.next().css({ "top": $el[0].offsetTop, "left": $parent.outerWidth() - 4 });
+                }
+
+                return false;
+            });
+        });
+
+    </script>
+
+
+
+
+
+    @RenderSection("Scripts", required: false)
+
+    @*<environment include="Development">
+            <script src="~/lib/jquery/dist/jquery.js"></script>
+            <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
+        </environment>
+        <environment exclude="Development">
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
+                    asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
+                    asp-fallback-test="window.jQuery"
+                    crossorigin="anonymous"
+                    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=">
+            </script>
+            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"
+                    asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"
+                    asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
+                    crossorigin="anonymous"
+                    integrity="sha384-xrRywqdh3PHs8keKZN+8zzc5TX0GRTLCcmivcbNJWm2rs5C8PRhcEn3czEjhAO9o">
+            </script>
+        </environment>
+        <script src="~/js/site.js" asp-append-version="true"></script>*@
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/umd/popper.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+    @*<script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>*@
+
+
+</body>
+</html>
