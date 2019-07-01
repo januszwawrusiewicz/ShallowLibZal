@@ -12,7 +12,7 @@ namespace ShallowLibApp.Services
 {
     public class ItemService : ILibService
     {
-        string url = "http://localhost:58326";
+        string url = "https://webapi20190630105314.azurewebsites.net/";
         HttpClient httpClient = new HttpClient();
 
         private readonly IMapper _mapper;
